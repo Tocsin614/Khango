@@ -1,0 +1,10 @@
+## Interface: 11508
+
+## Title: Khan_FuryWar_Helper
+## Author: ME
+## Version: 1.0
+## Notes: This is a routine made by me.
+
+## DefaultState: Enabled
+
+Khan_FuryWar.lua

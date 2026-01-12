@@ -340,7 +340,7 @@ local function MyRoutine()
                 end
             end
             -- Rapid Fire
-            if useRapidFire and S.RapidFire:IsReady(player) then
+            if useRapidFire and S.RapidFire:IsReady() then
                 if Cast(S.RapidFire) then
                     return "Rapid Fire"
                 end
@@ -356,7 +356,7 @@ local function MyRoutine()
             -- Racial Cooldowns
             if useRacial then
                 -- Orc: Blood Fury
-                if S.BloodFury and S.BloodFury:IsReady(player) then
+                if S.BloodFury and S.BloodFury:IsReady() then
                     if Cast(S.BloodFury) then
                         return "Blood Fury"
                     end

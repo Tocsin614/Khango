@@ -223,7 +223,7 @@ local function MyRoutine()
     -- INIT
     ------------------------------------------------------------
     local function Init()
-        MainAddon.Print("Arms Kebab Warrior - TBC Classic loaded! (DW Arms / Bloodfrenzy build)")
+        MainAddon:Print("Arms Kebab Warrior - TBC Classic loaded! (DW Arms / Bloodfrenzy build)")
     end
 
     ------------------------------------------------------------

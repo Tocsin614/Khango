@@ -1,4 +1,4 @@
-## Interface: 11508
+## Interface: 20505
 
 ## Title: Khan_Shaman_Helper
 ## Author: ME

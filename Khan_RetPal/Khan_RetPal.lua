@@ -708,10 +708,31 @@ local function MyRoutine()
         --------------------------------------------------------
         -- Always maintain buffs (in and out of combat)
         --------------------------------------------------------
-        -- Apply selected blessing if missing any blessing
+        -- Apply selected blessing if missing
         local useGreater = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'usegreater')
         
-        if not PlayerHasBlessing() then
+        -- Determine which blessing name to check for based on selection
+        local blessingName = nil
+        local greaterBlessingName = nil
+        
+        if blessingChoice == 'blessing_might' then
+            blessingName = BLESSING_OF_MIGHT_NAME
+            greaterBlessingName = GREATER_BLESSING_OF_MIGHT_NAME
+        elseif blessingChoice == 'blessing_wisdom' then
+            blessingName = BLESSING_OF_WISDOM_NAME
+            greaterBlessingName = GREATER_BLESSING_OF_WISDOM_NAME
+        elseif blessingChoice == 'blessing_kings' then
+            blessingName = BLESSING_OF_KINGS_NAME
+            greaterBlessingName = GREATER_BLESSING_OF_KINGS_NAME
+        elseif blessingChoice == 'blessing_salvation' then
+            blessingName = BLESSING_OF_SALVATION_NAME
+            greaterBlessingName = GREATER_BLESSING_OF_SALVATION_NAME
+        end
+        
+        -- Check if player has the SPECIFIC blessing they selected (normal OR greater version)
+        local hasSelectedBlessing = HasBuffByName("player", blessingName) or HasBuffByName("player", greaterBlessingName)
+        
+        if not hasSelectedBlessing then
             local blessingSpell = nil
             
             if useGreater then

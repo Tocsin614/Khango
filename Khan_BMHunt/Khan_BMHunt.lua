@@ -1,5 +1,5 @@
 local function MyRoutine()
-    local Author = 'Hunter - BM (TBC) 2.0'
+    local Author = 'Hunter - BM (TBC) 2.1'
     local SpecID = 3 -- Hunter
 
     ------------------------------------------------------------
@@ -18,8 +18,9 @@ local function MyRoutine()
 
     local Cast       = MainAddon.Cast
 
-    -- Auto Shot state
+    -- Auto Shot state tracking
     local AutoShot_ACTIVE = false
+    local LastTarget_GUID = nil
 
     ------------------------------------------------------------
     -- Spells (TBC) - LOCAL table
@@ -208,7 +209,7 @@ local function MyRoutine()
     local Hunter_Config = {
         key      = 'AUTHOR_HunterTBC',
         title    = 'Hunter - BM (TBC)',
-        subtitle = '2.0',
+        subtitle = '2.1',
         width    = 450,
         height   = 600,
         profiles = true,
@@ -279,7 +280,7 @@ local function MyRoutine()
     -- INIT
     ------------------------------------------------------------
     local function Init()
-        MainAddon:Print('Hunter - BM (TBC) 2.0 loaded....')
+        MainAddon:Print('Hunter - BM (TBC) 2.1 loaded....')
     end
 
     ------------------------------------------------------------
@@ -288,6 +289,7 @@ local function MyRoutine()
     local function EnemyRotation()
         if not MainAddon.TargetIsValid() then
             AutoShot_ACTIVE = false
+            LastTarget_GUID = nil
             return
         end
 
@@ -317,6 +319,13 @@ local function MyRoutine()
         if inMelee then
             AutoShot_ACTIVE = false
         else
+            -- Check if target changed - reset Auto Shot if new target
+            local currentTargetGUID = UnitGUID("target")
+            if currentTargetGUID ~= LastTarget_GUID then
+                AutoShot_ACTIVE = false
+                LastTarget_GUID = currentTargetGUID
+            end
+
             if S.AutoShot:IsReady() and not AutoShot_ACTIVE then
                 if Cast(S.AutoShot) then
                     AutoShot_ACTIVE = true
@@ -464,6 +473,7 @@ local function MyRoutine()
                     return "Explosive Trap"
                 end
             end
+
         end
 
         --------------------------------------------------------

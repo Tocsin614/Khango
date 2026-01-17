@@ -375,6 +375,13 @@ local function MyRoutine()
 				icon    = S.WaterShield:ID(),
 				default = true
 			},
+			{
+				type    = 'checkbox',
+				text    = 'Dual Wielding (enables offhand Windfury)',
+				key     = 'usedualwield',
+				icon    = S.WindfuryWeapon:ID(),
+				default = false
+			},
 
 			{ type='spacer' }, { type='ruler' }, { type='spacer' },
 
@@ -613,6 +620,7 @@ local function MyRoutine()
 		if not MainAddon.TargetIsValid() then
 			local useWFWeapon    = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usewfweapon')
 			local useWaterShield = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usewatershield')
+			local useDualWield   = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usedualwield')
 
 			-- APL 1: Windfury Weapon (Main Hand) - self check uses IsReady(Player)
 			if useWFWeapon
@@ -624,8 +632,9 @@ local function MyRoutine()
 				end
 			end
 
-			-- APL 1b: Windfury Weapon (Off Hand) - for dual-wield
+			-- APL 1b: Windfury Weapon (Off Hand) - for dual-wield (gated by dual wield checkbox)
 			if useWFWeapon
+				and useDualWield
 				and S.WindfuryWeapon:IsReady(Player)
 				and HasMainHandEnchant()
 				and not HasOffHandEnchant()
@@ -654,6 +663,7 @@ local function MyRoutine()
 
 		local useWFWeapon    = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usewfweapon')
 		local useWaterShield = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usewatershield')
+		local useDualWield   = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usedualwield')
 
 		local srageEnabled   = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'srage_check')
 		local srageThreshold = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'srage_spin') or 35
@@ -683,8 +693,9 @@ local function MyRoutine()
 			end
 		end
 
-		-- APL 1b: Windfury Weapon (Off Hand) - for dual-wield
+		-- APL 1b: Windfury Weapon (Off Hand) - for dual-wield (gated by dual wield checkbox)
 		if useWFWeapon
+			and useDualWield
 			and S.WindfuryWeapon:IsReady(Player)
 			and HasMainHandEnchant()
 			and not HasOffHandEnchant()
@@ -860,7 +871,7 @@ local function MyRoutine()
 	end
 
 	MainAddon.SetCustomAPL(Author, SpecID, MainRotation, Init)
-end -- CLOSES MyRoutine()
+end 
 
 ------------------------------------------------------------
 -- Loader loop

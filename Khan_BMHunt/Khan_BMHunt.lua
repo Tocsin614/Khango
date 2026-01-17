@@ -1,5 +1,5 @@
 local function MyRoutine()
-    local Author = 'Hunter - BM (TBC) 2.1'
+    local Author = 'Hunter - BM (TBC) 2.2'
     local SpecID = 3 -- Hunter
 
     ------------------------------------------------------------
@@ -110,6 +110,11 @@ local function MyRoutine()
     -- Utility
     S.ConcussiveShot = S.ConcussiveShot or Spell(5116)
     S.AutoShot       = S.AutoShot       or Spell(75)
+    S.Disengage      = MultiSpell(
+        781,    -- R1
+        14272,  -- R2
+        14273   -- R3
+    )
 
     -- Traps
     S.ExplosiveTrap = MultiSpell(
@@ -209,7 +214,7 @@ local function MyRoutine()
     local Hunter_Config = {
         key      = 'AUTHOR_HunterTBC',
         title    = 'Hunter - BM (TBC)',
-        subtitle = '2.1',
+        subtitle = '2.2',
         width    = 450,
         height   = 600,
         profiles = true,
@@ -249,6 +254,7 @@ local function MyRoutine()
             { type='checkbox', text='Use Steady Shot', key='usessteady', icon=S.SteadyShot:ID(), default=true },
             { type='checkbox', text='Use Arcane Shot', key='usearc', icon=S.ArcaneShot:ID(), default=true },
             { type='checkbox', text='Use Concussive Shot if target is on me', key='useconcussive', icon=S.ConcussiveShot:ID(), default=true },
+            { type='checkbox', text='Use Disengage if target is in melee and on me', key='usedisengage', icon=S.Disengage:ID(), default=true },
 
             { type='spacer' }, { type='ruler' }, { type='spacer' },
 
@@ -280,7 +286,7 @@ local function MyRoutine()
     -- INIT
     ------------------------------------------------------------
     local function Init()
-        MainAddon:Print('Hunter - BM (TBC) 2.1 loaded....')
+        MainAddon:Print('Hunter - BM (TBC) 2.2 loaded....')
     end
 
     ------------------------------------------------------------
@@ -303,6 +309,7 @@ local function MyRoutine()
         local useSteady     = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'usessteady')
         local useArc        = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'usearc')
         local useConcussive = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'useconcussive')
+        local useDisengage  = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'usedisengage')
 
         local explosiveEnabled = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'explosivetrap_check')
         local explosiveTargets = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'explosivetrap_spin') or 7
@@ -331,6 +338,19 @@ local function MyRoutine()
                     AutoShot_ACTIVE = true
                     return "Auto Shot (ON)"
                 end
+            end
+        end
+
+        --------------------------------------------------------
+        -- Disengage (escape from melee when being targeted)
+        --------------------------------------------------------
+        if useDisengage
+            and S.Disengage:IsReady()
+            and inMelee
+            and TargetIsTargetingPlayer()
+        then
+            if Cast(S.Disengage) then
+                return "Disengage"
             end
         end
 
@@ -554,7 +574,7 @@ local function MyRoutine()
     end
 
     MainAddon.SetCustomAPL(Author, SpecID, MainRotation, Init)
-end -- CLOSES MyRoutine()
+end 
 
 
 ------------------------------------------------------------

@@ -1,5 +1,5 @@
 local function MyRoutine()
-    local Author = 'Hunter - BM (TBC) 2.2'
+    local Author = 'Hunter - BM (TBC) 2.4'
     local SpecID = 3 -- Hunter
 
     ------------------------------------------------------------
@@ -21,6 +21,13 @@ local function MyRoutine()
     -- Auto Shot state tracking
     local AutoShot_ACTIVE = false
     local LastTarget_GUID = nil
+
+    ------------------------------------------------------------
+    -- Time Gate Tracking (prevent ability spam)
+    ------------------------------------------------------------
+    local lastRaptorStrikeTime = 0
+    local lastDisengageTime = 0
+    local MIN_RECAST_DELAY = 1.5  -- Minimum 1.5s between casts
 
     ------------------------------------------------------------
     -- Spells (TBC) - LOCAL table
@@ -214,7 +221,7 @@ local function MyRoutine()
     local Hunter_Config = {
         key      = 'AUTHOR_HunterTBC',
         title    = 'Hunter - BM (TBC)',
-        subtitle = '2.2',
+        subtitle = '2.4',
         width    = 450,
         height   = 600,
         profiles = true,
@@ -286,7 +293,7 @@ local function MyRoutine()
     -- INIT
     ------------------------------------------------------------
     local function Init()
-        MainAddon:Print('Hunter - BM (TBC) 2.2 loaded....')
+        MainAddon:Print('Hunter - BM (TBC) 2.4 loaded....')
     end
 
     ------------------------------------------------------------
@@ -343,14 +350,21 @@ local function MyRoutine()
 
         --------------------------------------------------------
         -- Disengage (escape from melee when being targeted)
+        -- Time gate prevents spam
         --------------------------------------------------------
         if useDisengage
             and S.Disengage:IsReady()
             and inMelee
             and TargetIsTargetingPlayer()
         then
-            if Cast(S.Disengage) then
-                return "Disengage"
+            local currentTime = GetTime()
+            local timeSinceLastDisengage = currentTime - lastDisengageTime
+            
+            if timeSinceLastDisengage > MIN_RECAST_DELAY then
+                if Cast(S.Disengage) then
+                    lastDisengageTime = currentTime
+                    return "Disengage"
+                end
             end
         end
 
@@ -498,23 +512,33 @@ local function MyRoutine()
 
         --------------------------------------------------------
         -- Melee priority: Mongoose Bite > Raptor Strike > Wing Clip
+        -- Raptor Strike is "next melee swing" (needs queue timing)
+        -- Mongoose/Wing Clip are instant (use on cooldown)
         --------------------------------------------------------
         if inMelee then
-            -- Mongoose Bite
+            -- Mongoose Bite (instant ability - use on cooldown)
             if S.MongooseBite:IsReady() then
                 if Cast(S.MongooseBite) then
                     return "Mongoose Bite"
                 end
             end
 
-            -- Raptor Strike
-            if S.RaptorStrike:IsReady() then
-                if Cast(S.RaptorStrike) then
-                    return "Raptor Strike"
+            -- Raptor Strike (next melee swing - only queue near swing)
+            -- Time gate prevents spam even on edge cases
+            local nextSwing = Player:NextSwing()
+            if S.RaptorStrike:IsReady() and nextSwing <= 0.2 then
+                local currentTime = GetTime()
+                local timeSinceLastRaptor = currentTime - lastRaptorStrikeTime
+                
+                if timeSinceLastRaptor > MIN_RECAST_DELAY then
+                    if Cast(S.RaptorStrike) then
+                        lastRaptorStrikeTime = currentTime
+                        return "Raptor Strike"
+                    end
                 end
             end
 
-            -- Wing Clip (for kiting)
+            -- Wing Clip (instant ability - use on cooldown for kiting)
             if S.WingClip:IsReady() and not TargetHasWingClip() then
                 if Cast(S.WingClip) then
                     return "Wing Clip"
@@ -574,7 +598,7 @@ local function MyRoutine()
     end
 
     MainAddon.SetCustomAPL(Author, SpecID, MainRotation, Init)
-end 
+end -- CLOSES MyRoutine()
 
 
 ------------------------------------------------------------

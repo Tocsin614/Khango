@@ -103,6 +103,7 @@ local function MyRoutine()
 		
 		Stormstrike = Spell(17364),        -- Stormstrike
 		ShamanisticRage = Spell(30823),    -- Shamanistic Rage
+		ShamanisticFocusBuff = Spell(43339), -- Shamanistic Focus proc buff (shows as "Focused")
 		FireElementalTotem = Spell(2894),  -- Fire Elemental Totem
 		
 		-- Totems (Earth / Air / Water / Fire)
@@ -183,11 +184,7 @@ local function MyRoutine()
 	------------------------------------------------------------
 	-- Helper spell names for buff/debuff checks (legacy)
 	------------------------------------------------------------
-	local FLAME_SHOCK_NAME      = GetSpellInfo(8050)
-
-	-- Shamanistic Focus proc detection (best-effort)
-	local PROC_NAME_1 = "Clearcasting"
-	local PROC_NAME_2 = "Shamanistic Focus"
+	local FLAME_SHOCK_NAME = GetSpellInfo(8050)
 
 	local function HasDebuffByName(unit, name)
 		if not name then return false end
@@ -204,27 +201,13 @@ local function MyRoutine()
 		end
 	end
 
-	local function HasBuffByName(unit, name)
-		if not name then return false end
-		local i = 1
-		while true do
-			local buffName = UnitBuff(unit, i)
-			if not buffName then
-				return false
-			end
-			if buffName == name then
-				return true
-			end
-			i = i + 1
-		end
-	end
-
 	local function TargetHasFlameShock()
 		return HasDebuffByName("target", FLAME_SHOCK_NAME)
 	end
 
+	-- Shamanistic Focus proc detection using buff ID
 	local function HasProcForCheapShock()
-		return HasBuffByName("player", PROC_NAME_1) or HasBuffByName("player", PROC_NAME_2)
+		return Player:BuffUp(S.ShamanisticFocusBuff)
 	end
 
 	------------------------------------------------------------
@@ -420,6 +403,13 @@ local function MyRoutine()
 				key     = 'useearthshock',
 				icon    = S.EarthShock:ID(),
 				default = true
+			},
+			{
+				type    = 'checkbox',
+				text    = 'Earth Shock only with Shamanistic Focus proc',
+				key     = 'shock_proc',
+				icon    = S.EarthShock:ID(),
+				default = false
 			},
 			{
 				type    = 'checkbox',
@@ -672,6 +662,7 @@ local function MyRoutine()
 
 		local useStormstrike = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usestormstrike')
 		local useEarthShock  = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'useearthshock')
+		local shockOnProc    = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'shock_proc')
 		local useFlameShock  = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'useflameshock')
 
 		local useSoE         = MainAddon.Config.GetSetting('AUTHOR_ShamanEnhTBC', 'usesoe')
@@ -822,10 +813,11 @@ local function MyRoutine()
 			end
 		end
 
-		-- APL 10: Earth Shock
+		-- APL 10: Earth Shock (with optional Shamanistic Focus proc check)
 		if useEarthShock
 			and inMelee
 			and S.EarthShock:IsReady()
+			and (not shockOnProc or HasProcForCheapShock())
 		then
 			if Cast(S.EarthShock) then -- APL 10
 				return "Earth Shock (APL 10)"
@@ -871,7 +863,7 @@ local function MyRoutine()
 	end
 
 	MainAddon.SetCustomAPL(Author, SpecID, MainRotation, Init)
-end 
+end -- CLOSES MyRoutine()
 
 ------------------------------------------------------------
 -- Loader loop

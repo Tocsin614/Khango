@@ -18,6 +18,9 @@ local function MyRoutine()
 
     local Cast       = MainAddon.Cast
 
+    -- Target tracking for auto-attack restart
+    local LastTarget_GUID = nil
+
     ------------------------------------------------------------
     -- Spells (all ranks) - LOCAL SPELL TABLE
     ------------------------------------------------------------
@@ -129,7 +132,7 @@ local function MyRoutine()
     end
 
     ------------------------------------------------------------
-    -- Items table (kept for structure)
+    -- Items table
     ------------------------------------------------------------
     Item.Warrior = Item.Warrior or {}
     local I = Item.Warrior
@@ -213,7 +216,7 @@ local function MyRoutine()
     -- INIT
     ------------------------------------------------------------
     local function Init()
-        MainAddon:Print('Fury Warrior - TBC Classic 1.0 loaded........')
+        MainAddon:Print('Fury Warrior - TBC Classic 1.1 loaded....')
     end
 
     ------------------------------------------------------------
@@ -231,11 +234,16 @@ local function MyRoutine()
         local inMelee = Target:IsInRange(5)
 
         --------------------------------------------------------
-        -- Auto Attack - ensure attacking in melee range
+        -- Track target changes and ensure auto-attack (HIGHEST PRIORITY)
         --------------------------------------------------------
+        local currentGUID = UnitGUID("target")
+        local nextSwing = Player:NextSwing()
+        
+        -- Auto attack if: not currently attacking (nextSwing == 0) OR target changed
         if inMelee and S.Attack:IsReady() then
-            if not IsCurrentSpell(6603) then
+            if nextSwing == 0 or currentGUID ~= LastTarget_GUID then
                 if Cast(S.Attack) then
+                    LastTarget_GUID = currentGUID
                     return "Auto Attack"
                 end
             end

@@ -125,6 +125,26 @@ local function MyRoutine()
     }
 
     ------------------------------------------------------------
+    -- Battle Shout buff ID list (all ranks)
+    ------------------------------------------------------------
+    local shoutList = {
+        [6673] = true,   -- R1
+        [5242] = true,   -- R2
+        [6192] = true,   -- R3
+        [11549] = true,  -- R4
+        [11550] = true,  -- R5
+        [11551] = true,  -- R6
+        [25289] = true,  -- R7
+        [2048] = true    -- R8 (TBC)
+    }
+
+    local commandingShoutList = {
+        [469] = true,    -- R1
+        [47439] = true,  -- R2
+        [47440] = true   -- R3
+    }
+
+    ------------------------------------------------------------
     -- Helper Functions
     ------------------------------------------------------------
     local function TargetIsBoss()
@@ -240,12 +260,12 @@ local function MyRoutine()
         local inMelee = Target:IsInRange(5)
 
         --------------------------------------------------------
-        -- Track target changes and ensure auto-attack (HIGHEST PRIORITY)
+        --
         --------------------------------------------------------
         local currentGUID = UnitGUID("target")
         local nextSwing = Player:NextSwing()
         
-        -- Auto attack if: not currently attacking (nextSwing == 0) OR target changed
+        -- 
         if inMelee and S.Attack:IsReady() then
             if nextSwing == 0 or currentGUID ~= LastTarget_GUID then
                 if Cast(S.Attack) then
@@ -258,8 +278,7 @@ local function MyRoutine()
         -- Commanding Shout override
         local autoCmdShout = MainAddon.Config.GetSetting('AUTHOR_ArmsKebabTBC', 'autocmdshout')
         if autoCmdShout 
-            and Player:BuffDown(S.CommandingShout)
-            and Player:BuffDown(S.BattleShout)
+            and not Player:HasBuffList(commandingShoutList)
             and S.CommandingShout:IsReady(Player)
         then
             if Cast(S.CommandingShout) then
@@ -436,11 +455,11 @@ local function MyRoutine()
         local autoStance = MainAddon.Config.GetSetting('AUTHOR_ArmsKebabTBC', 'autostance')
 
         --------------------------------------------------------
-        -- FIRST PRIORITY: Battle Shout (before anything else)
+        -- FIRST PRIORITY: Battle Shout (before anything else)  
+        -- HasBuffList checks for ANY Battle Shout rank from ANY player
         --------------------------------------------------------
         if autoBShout 
-            and Player:BuffDown(S.BattleShout)
-            and Player:BuffDown(S.CommandingShout)
+            and not Player:HasBuffList(shoutList)
             and S.BattleShout:IsReady(Player)
         then
             if Cast(S.BattleShout) then

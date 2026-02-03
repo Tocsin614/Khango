@@ -455,8 +455,8 @@ local function MyRoutine()
             local hasCommandSeal = PlayerHasSeal(SEAL_OF_COMMAND_NAME)
             local nextSwing = Player:NextSwing()
             
-            -- Twist to Blood at exactly <= 0.5s before auto attack
-            if hasCommandSeal and nextSwing <= 0.5 then
+            -- Twist to Blood at exactly <= 0.4s before auto attack
+            if hasCommandSeal and nextSwing <= 0.4 then
                 -- Try Seal of Blood (Horde)
                 if S.SealOfBlood:IsReady(Player) then
                     if Cast(S.SealOfBlood) then

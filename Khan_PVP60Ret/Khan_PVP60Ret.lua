@@ -398,26 +398,26 @@ local function MyRoutine()
         local playerLevel = UnitLevel("player")
 
         -- Config settings
-        local judgementEnabled     = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'judgement_check')
-        local judgementThreshold   = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'judgement_spin') or 30
+        local judgementEnabled     = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'judgement_check')
+        local judgementThreshold   = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'judgement_spin') or 30
 
-        local autoCrusader         = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'autocrusader')
-        local primarySeal          = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'primaryseal_leveling') or 'seal_command'
-        local autoBlood            = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'autoblood')
-        local enableTwist          = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'enabletwist')
-        local enableTwist60        = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'enabletwist60')
+        local autoCrusader         = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'autocrusader')
+        local primarySeal          = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'primaryseal_leveling') or 'seal_command'
+        local autoBlood            = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'autoblood')
+        local enableTwist          = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'enabletwist')
+        local enableTwist60        = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'enabletwist60')
 
-        local useCStrike           = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'usecstrike')
-        local useConsecration      = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'useconsecration')
-        local consecrationEnabled  = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'consecration_mana_check')
-        local consecrationThreshold = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'consecration_mana_spin') or 40
-        local consecrationTargetsEnabled = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'consecration_targets_check')
-        local consecrationTargets = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'consecration_targets_spin') or 4
+        local useCStrike           = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'usecstrike')
+        local useConsecration      = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'useconsecration')
+        local consecrationEnabled  = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'consecration_mana_check')
+        local consecrationThreshold = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'consecration_mana_spin') or 40
+        local consecrationTargetsEnabled = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'consecration_targets_check')
+        local consecrationTargets = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'consecration_targets_spin') or 4
 
-        local useExorcism          = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'useexorcism')
-        local useHolyWrath         = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'useholywrath')
-        local useHoW               = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'usehow')
-        local useAW                = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'useaw')
+        local useExorcism          = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'useexorcism')
+        local useHolyWrath         = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'useholywrath')
+        local useHoW               = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'usehow')
+        local useAW                = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'useaw')
 
         --------------------------------------------------------
         -- ABSOLUTE PRIORITY #1: Crusader Strike outside twist window (Level 70 Twisting)
@@ -795,9 +795,9 @@ local function MyRoutine()
     -- MAIN LOOP
     ------------------------------------------------------------
     local function MainRotation()
-        local autoRetAura   = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'autoretaura')
-        local useSanctity   = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'usesanctity')
-        local blessingChoice = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'autoblessing') or 'blessing_might'
+        local autoRetAura   = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'autoretaura')
+        local useSanctity   = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'usesanctity')
+        local blessingChoice = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'autoblessing') or 'blessing_might'
 
         local playerLevel = UnitLevel("player")
 
@@ -805,7 +805,7 @@ local function MyRoutine()
         -- Always maintain buffs (in and out of combat)
         --------------------------------------------------------
         -- Apply selected blessing if missing
-        local useGreater = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'usegreater')
+        local useGreater = MainAddon.Config.GetSetting('PVPRetPaladinTBC', 'usegreater')
         
         -- Determine which blessing name to check for based on selection
         local blessingName = nil

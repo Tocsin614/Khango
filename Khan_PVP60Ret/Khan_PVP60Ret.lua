@@ -420,15 +420,22 @@ local function MyRoutine()
         local useAW                = MainAddon.Config.GetSetting('AUTHOR_RetPaladinTBC', 'useaw')
 
         --------------------------------------------------------
-        -- ABSOLUTE PRIORITY #1: Crusader Strike with Blood (Level 70 Twisting)
-        -- Crusader Strike > Twist because CS does more damage, can't miss it
+        -- ABSOLUTE PRIORITY #1: Crusader Strike outside twist window (Level 70 Twisting)
+        -- Fire CS at opener (nextSwing == 0) or when nextSwing > 1.9s with Command active
+        -- CS is NOT part of the twist - it's just regular damage between twists
         --------------------------------------------------------
         if playerLevel >= 70 and enableTwist and useCStrike then
-            local hasBloodSeal = PlayerHasSeal(SEAL_OF_BLOOD_NAME) or PlayerHasSeal(SEAL_OF_MARTYR_NAME)
+            local nextSwing = Player:NextSwing()
+            local hasCommandSeal = PlayerHasSeal(SEAL_OF_COMMAND_NAME)
             
-            if hasBloodSeal and S.CrusaderStrike:IsReady() then
+            -- Fire CS if: opener (nextSwing == 0) OR (nextSwing > 1.9s AND Command active)
+            if S.CrusaderStrike:IsReady() and (nextSwing == 0 or (nextSwing > 1.9 and hasCommandSeal)) then
                 if Cast(S.CrusaderStrike) then
-                    return "Crusader Strike"
+                    if nextSwing == 0 then
+                        return "Crusader Strike (opener)"
+                    else
+                        return "Crusader Strike (with Command)"
+                    end
                 end
             end
         end
@@ -488,22 +495,42 @@ local function MyRoutine()
         end
 
         --------------------------------------------------------
-        -- ABSOLUTE PRIORITY #5: Crusader Strike with Righteousness (Level 60 Twisting)
-        -- Righteousness procs on the auto that follows the twist — CS with it active
-        -- is the biggest damage window, never miss it.
+        -- ABSOLUTE PRIORITY #5: Crusader Strike outside twist window (Level 60 Twisting)
+        -- Fire CS at opener (nextSwing == 0) or when nextSwing > 1.9s with Command active
+        -- CS is NOT part of the twist - it's just regular damage between twists
+        --------------------------------------------------------
+        if playerLevel < 70 and enableTwist60 and useCStrike then
+            local nextSwing = Player:NextSwing()
+            local hasCommandSeal = PlayerHasSeal(SEAL_OF_COMMAND_NAME)
+
+            -- Fire CS if: opener (nextSwing == 0) OR (nextSwing > 1.9s AND Command active)
+            if S.CrusaderStrike:IsReady() and (nextSwing == 0 or (nextSwing > 1.9 and hasCommandSeal)) then
+                if Cast(S.CrusaderStrike) then
+                    if nextSwing == 0 then
+                        return "Crusader Strike (opener)"
+                    else
+                        return "Crusader Strike (with Command)"
+                    end
+                end
+            end
+        end
+
+        --------------------------------------------------------
+        -- ABSOLUTE PRIORITY #6: Crusader Strike with Righteousness (Level 60 Twisting)
+        -- After the twist completes, fire CS with Righteousness for extra damage
         --------------------------------------------------------
         if playerLevel < 70 and enableTwist60 and useCStrike then
             local hasRighteousnessSeal = PlayerHasSeal(SEAL_OF_RIGHTEOUSNESS_NAME)
 
             if hasRighteousnessSeal and S.CrusaderStrike:IsReady() then
                 if Cast(S.CrusaderStrike) then
-                    return "Crusader Strike (twist)"
+                    return "Crusader Strike (with Righteousness)"
                 end
             end
         end
 
         --------------------------------------------------------
-        -- ABSOLUTE PRIORITY #6: Apply Command at 2.0s+ window (Level 60 Twisting)
+        -- ABSOLUTE PRIORITY #7: Apply Command at 2.0s+ window (Level 60 Twisting)
         -- No seal active and swing is far enough away — put Command up so
         -- it rides the auto before the twist window opens.
         --------------------------------------------------------
@@ -522,7 +549,7 @@ local function MyRoutine()
         end
 
         --------------------------------------------------------
-        -- ABSOLUTE PRIORITY #7: Twist Command → Righteousness at 0.4s (Level 60)
+        -- ABSOLUTE PRIORITY #8: Twist Command → Righteousness at 0.4s (Level 60)
         -- Same window as the level 70 Blood twist.  Command is up, swing is
         -- imminent — swap to Righteousness so the auto procs it.
         --------------------------------------------------------
@@ -540,7 +567,7 @@ local function MyRoutine()
         end
 
         --------------------------------------------------------
-        -- ABSOLUTE PRIORITY #8: Judgement with Righteousness active (Level 60 Twisting)
+        -- ABSOLUTE PRIORITY #9: Judgement with Righteousness active (Level 60 Twisting)
         -- Judge while Righteousness is up to get Judgement of Righteousness damage.
         --------------------------------------------------------
         if playerLevel < 70 and enableTwist60 then

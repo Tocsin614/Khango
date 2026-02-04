@@ -421,15 +421,15 @@ local function MyRoutine()
 
         --------------------------------------------------------
         -- ABSOLUTE PRIORITY #1: Crusader Strike outside twist window (Level 70 Twisting)
-        -- Fire CS at opener (nextSwing == 0) or when nextSwing > 1.9s with Command active
+        -- Fire CS at opener (nextSwing == 0) or when nextSwing > 2.1s with Command active
         -- CS is NOT part of the twist - it's just regular damage between twists
         --------------------------------------------------------
         if playerLevel >= 70 and enableTwist and useCStrike then
             local nextSwing = Player:NextSwing()
             local hasCommandSeal = PlayerHasSeal(SEAL_OF_COMMAND_NAME)
             
-            -- Fire CS if: opener (nextSwing == 0) OR (nextSwing > 1.9s AND Command active)
-            if S.CrusaderStrike:IsReady() and (nextSwing == 0 or (nextSwing > 1.9 and hasCommandSeal)) then
+            -- Fire CS if: opener (nextSwing == 0) OR (nextSwing > 2.1s AND Command active)
+            if S.CrusaderStrike:IsReady() and (nextSwing == 0 or (nextSwing > 2.1 and hasCommandSeal)) then
                 if Cast(S.CrusaderStrike) then
                     if nextSwing == 0 then
                         return "Crusader Strike (opener)"
@@ -496,15 +496,15 @@ local function MyRoutine()
 
         --------------------------------------------------------
         -- ABSOLUTE PRIORITY #5: Crusader Strike outside twist window (Level 60 Twisting)
-        -- Fire CS at opener (nextSwing == 0) or when nextSwing > 1.9s with Command active
+        -- Fire CS at opener (nextSwing == 0) or when nextSwing > 2.1s with Command active
         -- CS is NOT part of the twist - it's just regular damage between twists
         --------------------------------------------------------
         if playerLevel < 70 and enableTwist60 and useCStrike then
             local nextSwing = Player:NextSwing()
             local hasCommandSeal = PlayerHasSeal(SEAL_OF_COMMAND_NAME)
 
-            -- Fire CS if: opener (nextSwing == 0) OR (nextSwing > 1.9s AND Command active)
-            if S.CrusaderStrike:IsReady() and (nextSwing == 0 or (nextSwing > 1.9 and hasCommandSeal)) then
+            -- Fire CS if: opener (nextSwing == 0) OR (nextSwing > 2.1s AND Command active)
+            if S.CrusaderStrike:IsReady() and (nextSwing == 0 or (nextSwing > 2.1 and hasCommandSeal)) then
                 if Cast(S.CrusaderStrike) then
                     if nextSwing == 0 then
                         return "Crusader Strike (opener)"

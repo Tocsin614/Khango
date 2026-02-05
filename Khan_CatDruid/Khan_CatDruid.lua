@@ -18,12 +18,23 @@ local function MyRoutine()
 
     local Cast       = MainAddon.Cast
 
+    -- Target tracking for auto-attack restart
+    local LastTarget_GUID = nil
+
     ------------------------------------------------------------
     -- Local Spell Table (Don't use global HL.Spell.Druid)
     ------------------------------------------------------------
     local S = {
+        -- Auto Attack
+        Attack = Spell(6603),
+
         -- Shapeshift
         CatForm = Spell(768),
+        Prowl = MultiSpell(
+            5215,   -- Prowl (Rank 1)
+            6783,   -- Prowl (Rank 2)
+            9913    -- Prowl (Rank 3)
+        ),
 
         -- Cat Form Abilities
         MangleCat = MultiSpell(
@@ -40,6 +51,22 @@ local function MyRoutine()
             9830,   -- Shred (Rank 5)
             27001,  -- Shred (Rank 6 - TBC)
             27002   -- Shred (Rank 7 - TBC)
+        ),
+
+        Ravage = MultiSpell(
+            6785,   -- Ravage (Rank 1)
+            6787,   -- Ravage (Rank 2)
+            9866,   -- Ravage (Rank 3)
+            9867,   -- Ravage (Rank 4)
+            27005   -- Ravage (Rank 5 - TBC)
+        ),
+
+        Rake = MultiSpell(
+            1822,   -- Rake (Rank 1)
+            1823,   -- Rake (Rank 2)
+            1824,   -- Rake (Rank 3)
+            9904,   -- Rake (Rank 4)
+            27003   -- Rake (Rank 5 - TBC)
         ),
 
         Rip = MultiSpell(
@@ -62,6 +89,7 @@ local function MyRoutine()
 
         -- Debuff tracking
         RipDebuff = Spell(1079),
+        RakeDebuff = Spell(1822),
         MangleDebuff = Spell(33876),
         FaerieFireDebuff = Spell(16857),
 
@@ -106,6 +134,10 @@ local function MyRoutine()
     local FAERIE_FIRE_FERAL_NAME = GetSpellInfo(16857)
     local CAT_FORM_NAME = GetSpellInfo(768)
     local CLEARCASTING_NAME = GetSpellInfo(16870)
+    local PROWL_NAME = GetSpellInfo(5215)
+    local RIP_NAME = GetSpellInfo(1079)
+    local MANGLE_CAT_NAME = GetSpellInfo(33876)
+    local RAKE_NAME = GetSpellInfo(1822)
 
     local function HasBuffByName(unit, name)
         if not name then return false end
@@ -137,6 +169,24 @@ local function MyRoutine()
         end
     end
 
+    local function GetDebuffTimeRemaining(unit, name)
+        if not name then return 0 end
+        local i = 1
+        while true do
+            local debuffName, _, _, _, _, expirationTime = UnitDebuff(unit, i)
+            if not debuffName then
+                return 0
+            end
+            if debuffName == name then
+                if expirationTime then
+                    return expirationTime - GetTime()
+                end
+                return 0
+            end
+            i = i + 1
+        end
+    end
+
     local function PlayerHasCatForm()
         return HasBuffByName("player", CAT_FORM_NAME)
     end
@@ -147,6 +197,22 @@ local function MyRoutine()
 
     local function PlayerHasClearcasting()
         return HasBuffByName("player", CLEARCASTING_NAME)
+    end
+
+    local function PlayerHasProwl()
+        return HasBuffByName("player", PROWL_NAME)
+    end
+
+    local function TargetHasRip()
+        return HasDebuffByName("target", RIP_NAME)
+    end
+
+    local function TargetHasMangle()
+        return HasDebuffByName("target", MANGLE_CAT_NAME)
+    end
+
+    local function TargetHasRake()
+        return HasDebuffByName("target", RAKE_NAME)
     end
 
     local function TargetIsTargetingPlayer()
@@ -258,6 +324,8 @@ local function MyRoutine()
         -- Get current resources
         local energy = Player:Energy()
         local comboPoints = Player:ComboPoints()
+        local inMelee = Target:IsInRange(5)
+        local inCombat = Player:AffectingCombat()
 
         -- Get config settings
         local useFaerieFire = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'usefaeriefire')
@@ -281,48 +349,62 @@ local function MyRoutine()
         end
 
         --------------------------------------------------------
+        -- Auto-attack management (skip if in Prowl/stealth)
+        --------------------------------------------------------
+        local currentGUID = UnitGUID("target")
+        local nextSwing = Player:NextSwing()
+        
+        -- Check if player is stealthed (using framework BuffUp)
+        local isStealthed = Player:BuffUp(S.Prowl)
+        
+        if inMelee and not isStealthed and S.Attack:IsReady() then
+            if nextSwing == 0 or currentGUID ~= LastTarget_GUID then
+                if Cast(S.Attack) then
+                    LastTarget_GUID = currentGUID
+                    return "Auto Attack"
+                end
+            end
+        end
+
+        --------------------------------------------------------
         -- Single Target Rotation Priority
         --------------------------------------------------------
         
-        -- 1. Maintain Faerie Fire (Feral) if assigned to it (normally done by Balance Druid)
-        if useFaerieFire and Target:DebuffDown(S.FaerieFireDebuff) and S.FaerieFireFeral:IsReady() then
+        -- 0. Use Ravage if in Prowl (stealth) - HIGHEST PRIORITY
+        if isStealthed and S.Ravage:IsReady() then
+            if Cast(S.Ravage) then
+                return "Ravage (Prowl)"
+            end
+        end
+        
+        -- 1. Maintain Faerie Fire (Feral) if assigned and IN COMBAT (don't break stealth)
+        if inCombat and useFaerieFire and not TargetHasFaerieFireFeral() and S.FaerieFireFeral:IsReady() then
             if Cast(S.FaerieFireFeral) then
                 return "Faerie Fire (Feral)"
             end
         end
 
-        -- 2. Maintain Mangle (Cat) if assigned to it
-        if useMangle and Target:DebuffDown(S.MangleDebuff) and S.Mangle:IsReady() then
+        -- 2. Maintain Mangle (Cat) debuff if assigned to it
+        if useMangle and not TargetHasMangle() and S.Mangle:IsReady() then
             if Cast(S.Mangle) then
-                return "Mangle (Cat)"
+                return "Mangle (Cat) - debuff"
             end
         end
 
-        -- 3. Use Mangle (Cat) if target is targeting player (facing you) - can't Shred from front
-        if TargetIsTargetingPlayer() and S.Mangle:IsReady() then
-            if Cast(S.Mangle) then
-                return "Mangle (Cat) - target facing"
-            end
-        end
-
-        -- 4. Use Shred with Omen of Clarity proc
+        -- 3. Use Shred with Omen of Clarity proc (free energy)
         if PlayerHasClearcasting() and S.Shred:IsReady() then
             if Cast(S.Shred) then
                 return "Shred (Omen of Clarity)"
             end
         end
 
-        -- 5. Maintain Rip at 4+ Combo Points - Let it expire before reapplying
+        -- 4. Maintain Rip at 4+ Combo Points
         if ripComboEnabled and comboPoints >= ripComboPoints then
-            local ripRemaining = Target:DebuffRemains(S.RipDebuff) or 0
+            local ripRemaining = GetDebuffTimeRemaining("target", RIP_NAME)
             
-            -- Only apply Rip if:
-            -- - Rip is not on target, OR
-            -- - Rip has <= refresh threshold seconds remaining
-            local needsRip = false
-            if ripRemaining == 0 then
-                needsRip = true
-            elseif ripRefreshEnabled and ripRemaining <= ripRefreshTime then
+            -- Apply Rip if not on target OR about to expire
+            local needsRip = (ripRemaining == 0)
+            if ripRefreshEnabled and ripRemaining > 0 and ripRemaining <= ripRefreshTime then
                 needsRip = true
             end
             
@@ -333,24 +415,33 @@ local function MyRoutine()
             end
         end
 
-        -- 6. Use Shred to build combo points
+        -- 5. Use Mangle (Cat) if target is facing you (can't Shred from front)
+        if TargetIsTargetingPlayer() and S.Mangle:IsReady() then
+            if Cast(S.Mangle) then
+                return "Mangle (Cat) - target facing"
+            end
+        end
+
+        -- 6. Use Shred to build combo points (behind target)
         if S.Shred:IsReady() then
             if Cast(S.Shred) then
                 return "Shred"
             end
         end
 
-        -- 7. Power Shift if 21+ energy below the cost of your next ability
-        -- Power Shifting is casting Cat Form even when already in Cat Form to restore energy
+        -- 7. Use Rake as filler if Shred not available (not behind target)
+        if S.Rake:IsReady() and not TargetHasRake() then
+            if Cast(S.Rake) then
+                return "Rake"
+            end
+        end
+
+        -- 8. Power Shift if energy is too low
         if powerShift and powerShiftEnergyEnabled then
-            -- Determine next ability cost (Shred is the primary energy spender)
-            -- Base Shred cost is 60, but with talents it's typically 42-48
-            -- We'll use a conservative estimate of 42 energy
+            -- Shred base cost is ~42 energy with talents
             local nextAbilityCost = 42
             
-            -- If we're below the threshold energy needed for next ability
-            -- Example: if nextAbilityCost is 42 and threshold is 21:
-            --   We need 42 energy, so if energy < (42 - 21) = 21, we power shift
+            -- Power shift if energy < (cost - threshold)
             if energy < (nextAbilityCost - powerShiftThreshold) then
                 if S.CatForm:IsReady() then
                     if Cast(S.CatForm) then

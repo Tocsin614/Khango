@@ -1,6 +1,94 @@
 local function MyRoutine()
-    local Author = 'Hunter - BM (TBC) 2.4'
+    local Author = 'Hunter - BM (TBC) 3.2'
     local SpecID = 3 -- Hunter
+
+--[[
+
+                                                         .....'''..'''''''''''''''..........................                                                   
+                                                   ..'',;;;::;;,,,,,,,,,,,,,,,,,,,,,,,,,'''''''''''''................                                           
+                                               .';ccccc::;;;;;;;;::::::::::ccccc::;;;,,,,''''.................... ..........                                    
+                                          ..,:odxdocc::::::::::::ccccccccllcc:;;;;,''.......                          ..........                                
+                                       .,:odxxxxdolccccloolcccccccclllollc:;,'......        .........................................                           
+                                    .;oxOOkkkxxxxdollodxdlllllooddxddoc:,'...          .................................................                        
+                                 .;ok000000OOOkkkxxxxxxdddxxkkOOkxdc;'...         ..............                ..........................                      
+                              .:dOKK0000000000OOOkkkkxkkOO00Okxoc,...       ............                           ........................                     
+                            'lk0K0K000000000000OOOOOOO0000Okoc,...     ...........                                  .........................                   
+                          ,oO000000O000000000000OOO0000Okdl;..     ..........                                        ........    ..............                 
+                        .lO00000OkkkOO000000000OOOO00Oxo:'. .............                                              ......    ................               
+                      .ck0OOOOkkxxxxkkOOOOOOOOOOOOOOko;.     .......                                                     ......  .................              
+                     'dOOOOOkxddddxxxkkOOOOOOOOOOOkdc'.    .......                                                        ..........................            
+                    ,xOOOOkxdoodddxxxxkkOOOOOOOOOkd:.  ........                                                            ..........................           
+                   ,xOOOkxocccodddxxxxxkkkOOOOOOkd:.   ......                                                               ...........................         
+                  ,xOOOkdollc:::lddxxxxxkkOOO0Oxo;.........                                                                  ........................... .'..   
+                 ,kOOOkoloooll:;,;coddxxkkOOOkxo;. ......                                                                    ..''''................. ...'';c;'..
+                'xOkxdolcllllolc;,';ldxkOOOOkdo;.   ....                                                                      .;;;,'................    ..',,...
+               .o0kxxolc::codxxdl;'';okkOOOOxd:.  .....                                                                        ':::;'...............       .....
+               :Okxxxolc:::clllc:,'';okkOOOxdl'.  ....                                                                         .;c:;'''''''''........        .  
+              .dkdxxdlc::::;,,'',,:codxkOOkdo,.  ...                                                                            .:::,''''''''''......           
+              ;xddddlc::::::;;;cloddddxkkkxd:. ....                                                                              ,::,''..'''''''.....           
+             .cxooool:::;;;:::clooooddxkkxdl'......                                                                               ';'.......'''''...            
+             .ldoloolc;,',,,,,;:ccclodxxxdd:.......                                                                                ............'''.....         
+             .odollol:',:lol;..,:ccldxxxddl'.......                                                                                    ..........''.....        
+             'odolll:,;lddddc...;ccodxxxdd:.......                                                                                   .',:llc,......''....       
+             ;ddolc:;:oddddd:..';ccoxxxddl,.......                                                                                   ';;;codo,.............     
+            .cdool::lolloddo,...;cclxxdddc........                                                                               .';::;,'',;;'..............    
+            .cdooc:lolc:lodl'...':cldxddo,........                                                                              .coodddl:'....''........        
+            .cdooc:ll::;:lol'....,:lddddl.........                                                                           .'',:cloooloc.....';,''......      
+            .cdolc;::::::col;....':lddddc. .......                                                                         .ckOOOxl:,,,,:;'.    .',,,'........  
+             ;olcc;;;,,,;:c:;'...';lodddc. .......                                                                         .okOO0K0d:'..'..        ......       
+             ,olc::;,'...',,''...':lodddc.  ......                                                                      .';ldxdocllc:'...                       
+             'ol:::::;;,''......';ccodooc'. .......                                                                    ,k0K0Okxdl,......                        
+             'll:::::::;;;,,,,;;::::llloc'.........                                                                    'k0000Okddc'....                         
+             .ll::::;,,,,,;;::::;;;:clllc,.........                                                                    'lxxxxdoll:.                             
+             .cl:::,'',,,'',;:;;;;;:clllc,..  .....                                                                   ;oddl;,,,,'.                              
+             .:l::;,',col;'',;::;;;:clllc;..   .....                                                                .o0Oko,.....                                
+              ;o:;;''cdddl,'',::;;;:ccclc;'.   .....                                                               ;kK0Ol.                                      
+              ,oc:;',ldoll:,'';c:;;;:ccc:;'.   .....                                                             'd0K0d'                                        
+              'ol:,''cdlccc;..,:c:;,,:ccc;'..   ....                                                            :OK0x;                                          
+              'ol:,''cdlccc,..':c:;,,,;cc;,..    ....                                                         .lO0Oc.                                           
+              .lo:,'':olccc,...;:::,,,;cc:,'.    ....                                                        .oOOx,                                             
+              .cl:,'.;olccc,...':::;,,;:c:,'.    ....                                                       ,dkkl.                                              
+              .:c;,..;lcclc,....,:::;,,:c:,,.     ...                                                     .:dxo,                                                
+              .,;,'..;ccllc;.....,;:;,,:c:,,'.    .. .                                                   .cdd:.                                                 
+              .......;ccllc;,.....,;;,,:c:,,'.       .                                                  'ldo,                                                   
+              ......'ccclc;,'.....',,,;:c:;,'.       ..                                                ,odc.                                                    
+              .... .;c:cc:;''......',,;:::;,'.       ..                                              .:dd;.                                                     
+             .... .,::cc:;;;,'......',;:::;,,.       ...                                            .cxl'                                                       
+            ....  ':::::;,;;;,'.....'';:;:;,,..      ...                                           'oxc.                                                        
+            .... .;:::;,,,,,;,'......',;;;;,,..      ...                                          ;xx:.                                                         
+      ..    .    .,::;,'''',,,'.......,;;;;,'..     ....                                        .ckx,                                                           
+     ,kOo;..     ..';;.....'','.......',,;;,,..    .....                                       'oko.                                                            
+    .dNWWKko;.    .....................'',,,,.     .....                                     .:dxc.                                                             
+    ,oOKNWNXKko:'........................',''.     .....                                   .,oxo,                                                               
+  .,:lldk0XNNNXKOxl,.....................',''.     .....                                  'lddc.                                                                
+ .;coddodxO0KNNNXXX0xl,...................'''.     .....                                .cxxd;                                                                  
+.,ldkOOOkkk00KXNWWWNNX0xl;................'''.     .....                               ,okkd'                                                                   
+  .:dOO00KKXXKKXXNNWWWNNX0xl,..... ......''''.     ....                              .cxkxl.                                                                    
+    .;dO0KNWWNXKKKKKKKXNNNX0ko;...........''.    ....'.                             ,dkkx:.                                                                     
+l:.   .,oOKXNWWNXK0OOkkO00OOkkko:........''.     ...'.                            .cxxko'                                                                       
+kkxl'    'lkKXNWNX0kxdxxxddddooddoc;'.......    ...''.                          .,dkkxc.                                                                        
+dkkOko,. ..'cd0KXNX0xxkkkkxoccllllcllc;'...    ...,;'                         .lxkkko'                                                                          
+:dkOOOOxc,.. .;oOKXNX0OkOkkdolccc:;;;:lc:'..  ...,:;.                       .:xkkkx:.                                                                           
+,;okOOOOOko:.  .'lkKNNNKOkxdollc:;;;;;;;:::,....,::.                       .okkkxl.                                                                             
+,,:okOO00OOOxl,.  .:xKNWNKkollc::;;;;;;;;;;::,,,;:'                       'dkkx;.                                                                               
+,,:oxOOOO000OOkd:.  .;xKXNX0xoc::;;;;;;;;;;;;:c:;'                       ;dxxo'                                                                                 
+,,:oxkOOOOOOOOkkko,.  .,oOKK0kdlc;,,,,,,,,,,;;cc:.                     .cdddl.                                                                                  
+llldkkOOOOkkkxxkkkxl,.   .:oxkkdoc;,''''',,,,;:c;.                   .;oood:.                                                                                   
+.cdkkOOOOkkxxxxxxxdddl;.   .';lodlcc;,,,;;;;;;,..                   'coool,                                                                                     
+  .:dOOOOkkkxdollllllol,..    ..''';:c:::::::,.                   .;lollc.                                                                                      
+'.  .:dOOOOkxoccccccc:,......      .,ccccll:'                    .coolc,.                                                                                       
+,,,....:dkOOkxolccc:,'..............,cclll;.                   .;odoc;.                                                                                         
+'',,,''..;okOkxxdlc,'..............';:clc'                    'colc:'.                                                                                          
+..',,;,,'..;ldkkxdoc;'.............';::;.                   .,:cc:,.                                                                                            
+  ...',;;,'...;codxoc;'............,;:,.                   .;;;;,'.                                                                                             
+      .',,;'...  .,::;............';:'                   .,;;,'..                                                                                               
+        ..'...       .............;:.                   ...'....                                                                                                
+..       .....              .....,c'                    .......                                                                                                 
+
+
+]]
+
+
 
     ------------------------------------------------------------
     -- Framework
@@ -21,6 +109,38 @@ local function MyRoutine()
     -- Auto Shot state tracking
     local AutoShot_ACTIVE = false
     local LastTarget_GUID = nil
+
+    ------------------------------------------------------------
+    -- Ranged Swing Timer Tracking (for Steady Shot timing)
+    ------------------------------------------------------------
+    local lastAutoShotTime = 0
+    
+    -- Create frame to track Auto Shot from combat log
+    local SwingTimerFrame = CreateFrame("Frame")
+    SwingTimerFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    SwingTimerFrame:SetScript("OnEvent", function()
+        local _, subEvent, _, sourceGUID, _, _, _, _, _, _, _, spellID =
+            CombatLogGetCurrentEventInfo()
+        -- Track when Auto Shot (spell ID 75) FIRES (not when it hits)
+        if subEvent == "SPELL_CAST_SUCCESS"
+            and sourceGUID == UnitGUID("player")
+            and spellID == 75 then
+            lastAutoShotTime = GetTime()
+        end
+    end)
+    
+    -- Calculate time remaining until next Auto Shot
+    local function GetRangedSwingRemaining()
+        if lastAutoShotTime == 0 then
+            return 0  -- Haven't fired an auto shot yet
+        end
+        local speed = select(1, UnitRangedDamage("player")) or 0
+        if speed == 0 then
+            return 0  -- No ranged weapon equipped
+        end
+        local remaining = (lastAutoShotTime + speed) - GetTime()
+        return math.max(0, remaining)  -- Never return negative
+    end
 
     ------------------------------------------------------------
     -- Time Gate Tracking (prevent ability spam)
@@ -149,6 +269,10 @@ local function MyRoutine()
     local ASPECT_VIPER_NAME   = GetSpellInfo(34074)
     local BLOODLUST_NAME      = GetSpellInfo(2825)   -- Horde: Bloodlust
     local HEROISM_NAME        = GetSpellInfo(32182)  -- Alliance: Heroism
+    local RAPID_FIRE_NAME     = GetSpellInfo(3045)   -- Rapid Fire buff
+    local QUICK_SHOTS_NAME    = GetSpellInfo(6150)   -- Quick Shots proc (15% haste)
+    local HASTE_POTION_NAME   = GetSpellInfo(28507)  -- Haste Potion buff (30% haste)
+    local ABACUS_NAME         = GetSpellInfo(45040)  -- Abacus of Violent Odds (260 haste rating = ~16.5% haste)
 
     local function HasDebuffByName(unit, name)
         if not name then return false end
@@ -200,6 +324,62 @@ local function MyRoutine()
         return HasBuffByName("player", BLOODLUST_NAME) or HasBuffByName("player", HEROISM_NAME)
     end
 
+    local function HasRapidFire()
+        return HasBuffByName("player", RAPID_FIRE_NAME)
+    end
+
+    local function HasQuickShots()
+        return HasBuffByName("player", QUICK_SHOTS_NAME)
+    end
+
+    local function HasHastePotion()
+        return HasBuffByName("player", HASTE_POTION_NAME)
+    end
+
+    local function HasAbacus()
+        return HasBuffByName("player", ABACUS_NAME)
+    end
+
+    -- Calculate Steady Shot cast time based on active haste buffs
+    -- All haste effects are multiplicative with each other
+    local function GetSteadyShotCastTime(hasSerpentsSwiftness)
+        local baseCastTime = 1.5
+        local hasteMultiplier = 1.0
+        
+        -- Serpent's Swiftness (BM talent): 20% haste (passive)
+        if hasSerpentsSwiftness then
+            hasteMultiplier = hasteMultiplier * 1.20
+        end
+        
+        -- Quick Shots (talent proc): 15% haste
+        if HasQuickShots() then
+            hasteMultiplier = hasteMultiplier * 1.15
+        end
+        
+        -- Abacus of Violent Odds (trinket): ~16.5% haste (260 haste rating)
+        if HasAbacus() then
+            hasteMultiplier = hasteMultiplier * 1.165
+        end
+        
+        -- Rapid Fire: 40% haste
+        if HasRapidFire() then
+            hasteMultiplier = hasteMultiplier * 1.40
+        end
+        
+        -- Haste Potion: 30% haste (400 haste rating)
+        if HasHastePotion() then
+            hasteMultiplier = hasteMultiplier * 1.30
+        end
+        
+        -- Bloodlust/Heroism: 30% haste
+        if HasBloodlust() then
+            hasteMultiplier = hasteMultiplier * 1.30
+        end
+        
+        -- Formula: new_cast_time = base_cast_time / haste_multiplier
+        return baseCastTime / hasteMultiplier
+    end
+
     ------------------------------------------------------------
     -- Items table (kept for structure)
     ------------------------------------------------------------
@@ -221,12 +401,32 @@ local function MyRoutine()
     local Hunter_Config = {
         key      = 'AUTHOR_HunterTBC',
         title    = 'Hunter - BM (TBC)',
-        subtitle = '2.4',
+        subtitle = '3.2',
         width    = 450,
         height   = 600,
         profiles = true,
         config   = {
             { type='header', text='BM Hunter (TBC)', size=24, align='Center', color='ffffff' },
+
+            { type='spacer' }, { type='ruler' }, { type='spacer' },
+
+            { type='header', text='Melee Abilities', color='ffffff' },
+            {
+                type    = 'checkbox',
+                text    = 'Use Melee Spells (Raptor/Mongoose/Wing Clip)',
+                key     = 'usemelee',
+                default = false,
+            },
+
+            { type='spacer' }, { type='ruler' }, { type='spacer' },
+
+            { type='header', text='Talents', color='ffffff' },
+            {
+                type    = 'checkbox',
+                text    = "Serpent's Swiftness (20% passive haste)",
+                key     = 'serpentswiftness',
+                default = true,
+            },
 
             { type='spacer' }, { type='ruler' }, { type='spacer' },
 
@@ -293,7 +493,7 @@ local function MyRoutine()
     -- INIT
     ------------------------------------------------------------
     local function Init()
-        MainAddon:Print('Hunter - BM (TBC) 2.4 loaded....')
+        MainAddon:Print('Hunter - BM (TBC) 3.2 loaded....')
     end
 
     ------------------------------------------------------------
@@ -307,6 +507,7 @@ local function MyRoutine()
         end
 
         local mana    = Player:ManaPercentage()
+        -- Dead zone: melee range is < 5 yards, ranged is 5+ yards
         local inMelee = Target:IsInRange(5)
 
         -- Config settings
@@ -318,6 +519,9 @@ local function MyRoutine()
         local useConcussive = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'useconcussive')
         local useDisengage  = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'usedisengage')
 
+        -- Talent settings
+        local hasSerpentsSwiftness = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'serpentswiftness')
+
         local explosiveEnabled = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'explosivetrap_check')
         local explosiveTargets = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'explosivetrap_spin') or 7
 
@@ -326,6 +530,9 @@ local function MyRoutine()
         local useBW         = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'usebw')
         local useRacial     = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'useracial')
         local useTrinkets   = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'usetrinkets')
+
+        -- Melee settings
+        local useMelee      = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'usemelee')
 
         --------------------------------------------------------
         -- Auto Shot toggle (ranged only)
@@ -480,16 +687,17 @@ local function MyRoutine()
 
             --------------------------------------------------------
             -- Steady Shot (main filler - ONLY cast if enough time before auto)
-            -- Need enough time to finish 1.5s cast before next auto
-            -- Check if we have at least 1.5s before next swing
+            -- Cast time varies with haste buffs (Rapid Fire 40%, Bloodlust 30%)
             --------------------------------------------------------
             if useSteady
                 and S.SteadyShot:IsReady()
             then
-                local nextSwing = Player:NextSwing()
-                -- Cast if we have more than 1.5s until next auto
-                -- This ensures we finish the cast before clipping
-                if nextSwing > 1.6 or nextSwing == 0 then   --changed to 1.6 to allow for a lil lag
+                local nextShot = GetRangedSwingRemaining()
+                local steadyCastTime = GetSteadyShotCastTime(hasSerpentsSwiftness)
+                local safetyBuffer = 0.2  -- 200ms buffer for latency
+                
+                -- Cast if we have enough time to finish before next auto
+                if nextShot > (steadyCastTime + safetyBuffer) or nextShot == 0 then
                     if Cast(S.SteadyShot) then
                         return "Steady Shot"
                     end
@@ -517,7 +725,7 @@ local function MyRoutine()
         --------------------------------------------------------
         if inMelee then
             -- Mongoose Bite (instant ability - use on cooldown)
-            if S.MongooseBite:IsReady() then
+            if useMelee and S.MongooseBite:IsReady() then
                 if Cast(S.MongooseBite) then
                     return "Mongoose Bite"
                 end
@@ -526,7 +734,7 @@ local function MyRoutine()
             -- Raptor Strike (next melee swing - only queue near swing)
             -- Time gate prevents spam even on edge cases
             local nextSwing = Player:NextSwing()
-            if S.RaptorStrike:IsReady() and nextSwing <= 0.2 then
+            if useMelee and S.RaptorStrike:IsReady() and nextSwing <= 0.2 then
                 local currentTime = GetTime()
                 local timeSinceLastRaptor = currentTime - lastRaptorStrikeTime
                 
@@ -539,7 +747,7 @@ local function MyRoutine()
             end
 
             -- Wing Clip (instant ability - use on cooldown for kiting)
-            if S.WingClip:IsReady() and not TargetHasWingClip() then
+            if useMelee and S.WingClip:IsReady() and not TargetHasWingClip() then
                 if Cast(S.WingClip) then
                     return "Wing Clip"
                 end

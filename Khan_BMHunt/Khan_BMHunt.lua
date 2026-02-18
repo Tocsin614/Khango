@@ -89,8 +89,7 @@ llldkkOOOOkkkxxkkkxl,.   .:oxkkdoc;,''''',,,,;:c;.                   .;oood:.
 ]]
 
 
-
-    ------------------------------------------------------------
+------------------------------------------------------------
     -- Framework
     ------------------------------------------------------------
     local MainAddon = MainAddon
@@ -243,6 +242,18 @@ llldkkOOOOkkkxxkkkxl,.   .:oxkkdoc;,''''',,,,;:c;.                   .;oood:.
         14273   -- R3
     )
 
+    -- Pet Management
+    S.MendPet = MultiSpell(
+        136,    -- R1
+        3111,   -- R2
+        3661,   -- R3
+        3662,   -- R4
+        13542,  -- R5
+        13543,  -- R6
+        13544,  -- R7
+        27046   -- R8 (TBC)
+    )
+
     -- Traps
     S.ExplosiveTrap = MultiSpell(
         13813,  -- R1
@@ -273,6 +284,7 @@ llldkkOOOOkkkxxkkkxl,.   .:oxkkdoc;,''''',,,,;:c;.                   .;oood:.
     local QUICK_SHOTS_NAME    = GetSpellInfo(6150)   -- Quick Shots proc (15% haste)
     local HASTE_POTION_NAME   = GetSpellInfo(28507)  -- Haste Potion buff (30% haste)
     local ABACUS_NAME         = GetSpellInfo(45040)  -- Abacus of Violent Odds (260 haste rating = ~16.5% haste)
+    local MEND_PET_NAME       = GetSpellInfo(136)    -- Mend Pet buff
 
     local function HasDebuffByName(unit, name)
         if not name then return false end
@@ -426,6 +438,20 @@ llldkkOOOOkkkxxkkkxl,.   .:oxkkdoc;,''''',,,,;:c;.                   .;oood:.
                 text    = "Serpent's Swiftness (20% passive haste)",
                 key     = 'serpentswiftness',
                 default = true,
+            },
+
+            { type='spacer' }, { type='ruler' }, { type='spacer' },
+
+            { type='header', text='Pet Management', color='ffffff' },
+            {
+                type          = 'checkspin',
+                text          = 'Mend Pet when below health %',
+                key           = 'mendpet',
+                min           = 1,
+                max           = 100,
+                icon          = S.MendPet:ID(),
+                default_check = true,
+                default_spin  = 75,
             },
 
             { type='spacer' }, { type='ruler' }, { type='spacer' },
@@ -766,7 +792,22 @@ llldkkOOOOkkkxxkkkxl,.   .:oxkkdoc;,''''',,,,;:c;.                   .;oood:.
         local hawkEnabled     = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'viperoff_check')
         local viperOffThreshold = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'viperoff_spin') or 60
 
+        local mendPetEnabled   = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'mendpet_check')
+        local mendPetThreshold = MainAddon.Config.GetSetting('AUTHOR_HunterTBC', 'mendpet_spin') or 75
+
         local mana = Player:ManaPercentage()
+
+        --------------------------------------------------------
+        -- Pet Management (ALWAYS - in and out of combat)
+        --------------------------------------------------------
+        if mendPetEnabled and UnitExists("pet") and not UnitIsDead("pet") then
+            local petHealth = (UnitHealth("pet") / UnitHealthMax("pet")) * 100
+            if petHealth < mendPetThreshold and S.MendPet:IsReady() and not HasBuffByName("pet", MEND_PET_NAME) then
+                if Cast(S.MendPet) then
+                    return "Mend Pet"
+                end
+            end
+        end
 
         --------------------------------------------------------
         -- Aspect Management (ALWAYS - in and out of combat)

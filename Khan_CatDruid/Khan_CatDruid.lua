@@ -392,7 +392,7 @@ local function MyRoutine()
         end
 
         -- 3. Use Shred with Omen of Clarity proc (free energy)
-        if PlayerHasClearcasting() and S.Shred:IsReady() then
+        if PlayerHasClearcasting() and S.Shred:IsReady() and not TargetIsTargetingPlayer() then
             if Cast(S.Shred) then
                 return "Shred (Omen of Clarity)"
             end
@@ -465,7 +465,10 @@ local function MyRoutine()
 
         --------------------------------------------------------
         -- Always maintain buffs (in and out of combat)
+        -- Skip if in Prowl - casting breaks stealth
         --------------------------------------------------------
+        if not PlayerHasProwl() and not Player:AffectingCombat() then
+
         -- Mark of the Wild / Gift of the Wild - checking buff ID with Player:BuffDown
         if autoMark then
             if useGift 
@@ -504,6 +507,8 @@ local function MyRoutine()
                 return "Omen of Clarity"
             end
         end
+
+        end -- not PlayerHasProwl()
 
         --------------------------------------------------------
         -- Enemy rotation

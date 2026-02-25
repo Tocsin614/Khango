@@ -79,6 +79,15 @@ local function MyRoutine()
             27008   -- Rip (Rank 7 - TBC)
         ),
 
+        FerociousBite = MultiSpell(
+            22568,  -- Ferocious Bite (Rank 1)
+            22827,  -- Ferocious Bite (Rank 2)
+            22828,  -- Ferocious Bite (Rank 3)
+            22829,  -- Ferocious Bite (Rank 4)
+            31018,  -- Ferocious Bite (Rank 5)
+            27009   -- Ferocious Bite (Rank 6 - TBC)
+        ),
+
         FaerieFireFeral = MultiSpell(
             16857,  -- Faerie Fire (Feral) (Rank 1)
             17390,  -- Faerie Fire (Feral) (Rank 2)
@@ -215,6 +224,36 @@ local function MyRoutine()
         return HasDebuffByName("target", RAKE_NAME)
     end
 
+    local function TargetTimeToDie()
+        if MainAddon.TargetTimeToDie then return MainAddon:TargetTimeToDie() or nil end
+    end
+
+    ------------------------------------------------------------
+    -- Ferocious Bite top-end damage table [spellID][comboPoints]
+    -- Values are top-end tooltip damage including AP contribution.
+    -- Used to check if target HP <= what a Bite would deal - no
+    -- point putting a Rip on a target that will die to a Bite.
+    -- Rank 6 (27009) values need in-game verification.
+    ------------------------------------------------------------
+    local FerociousBiteTopEnd = {
+        [22568] = {  66, 102, 138, 174, 210 },  -- Rank 1 (lvl 32)
+        [22827] = { 103, 162, 221, 280, 339 },  -- Rank 2 (lvl 40)
+        [22828] = { 162, 254, 346, 438, 530 },  -- Rank 3 (lvl 48)
+        [22829] = { 223, 351, 479, 607, 735 },  -- Rank 4 (lvl 56)
+        [31018] = { 259, 406, 553, 700, 847 },  -- Rank 5 (lvl 60)
+        [27009] = { 292, 461, 630, 799, 968 },  -- Rank 6 (lvl 63)
+    }
+
+    local function TargetDiesFromBite(comboPoints)
+        local spellID = S.FerociousBite:ID()
+        local dmgTable = FerociousBiteTopEnd[spellID]
+        if not dmgTable then return false end
+        local cp = math.min(comboPoints, 5)
+        local topEnd = dmgTable[cp]
+        if not topEnd then return false end
+        return UnitHealth("target") <= topEnd
+    end
+
     local function TargetIsTargetingPlayer()
         return Target:Exists()
             and Target:CanAttack(Player)
@@ -277,10 +316,24 @@ local function MyRoutine()
                 min           = 0,
                 max           = 10,
                 icon          = S.Rip:ID(),
-                default_check = true,
+                default_check = false,
                 default_spin  = 2,
             },
-            { type='text', text='Reapply Rip when <= X seconds remaining', size=11, color='aaaaaa' },
+            { type='text', text='Reapply Rip when <= X seconds remaining (disabled by default - let Rip expire for last tick)', size=11, color='aaaaaa' },
+
+            { type='spacer' },
+
+            {
+                type          = 'checkspin',
+                text          = 'Rip min TTD',
+                key           = 'rip_ttd',
+                min           = 2,
+                max           = 30,
+                icon          = S.FerociousBite:ID(),
+                default_check = true,
+                default_spin  = 8,
+            },
+            { type='text', text='Use Ferocious Bite instead of Rip if TTD < X sec', size=11, color='aaaaaa' },
 
             { type='spacer' }, { type='ruler' }, { type='spacer' },
 
@@ -317,7 +370,7 @@ local function MyRoutine()
     -- ENEMY ROTATION
     ------------------------------------------------------------
     local function EnemyRotation()
-        if not Target:Exists() or not Target:IsInRange(10) or Target:IsDeadOrGhost() then
+        if not Target:Exists() or not Target:IsEnemy() or not Target:IsInRange(10) or Target:IsDeadOrGhost() then
             return
         end
 
@@ -334,6 +387,8 @@ local function MyRoutine()
         local ripComboPoints = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'rip_combo_spin') or 4
         local ripRefreshEnabled = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'rip_refresh_check')
         local ripRefreshTime = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'rip_refresh_spin') or 2
+        local ripTtdEnabled = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'rip_ttd_check')
+        local ripTtdThreshold = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'rip_ttd_spin') or 8
         local powerShift = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'powershift')
         local powerShiftEnergyEnabled = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'powershift_energy_check')
         local powerShiftThreshold = MainAddon.Config.GetSetting('AUTHOR_FeralDpsTBC', 'powershift_energy_spin') or 21
@@ -398,19 +453,40 @@ local function MyRoutine()
             end
         end
 
-        -- 4. Maintain Rip at 4+ Combo Points
+        -- 4. Rip or Ferocious Bite at combo point threshold
         if ripComboEnabled and comboPoints >= ripComboPoints then
-            local ripRemaining = GetDebuffTimeRemaining("target", RIP_NAME)
-            
-            -- Apply Rip if not on target OR about to expire
-            local needsRip = (ripRemaining == 0)
-            if ripRefreshEnabled and ripRemaining > 0 and ripRemaining <= ripRefreshTime then
-                needsRip = true
-            end
-            
-            if needsRip and S.Rip:IsReady() then
-                if Cast(S.Rip) then
-                    return "Rip"
+            local ttd = TargetTimeToDie()
+
+            -- TTD is unreliable on fast trash kills - Bite damage table is the reliable fallback.
+            -- Bite if TTD says dying soon OR target HP <= what a Bite at current CP would deal.
+            local dyingSoon = ripTtdEnabled and (
+                (ttd and ttd > 0 and ttd < ripTtdThreshold) or
+                TargetDiesFromBite(comboPoints)
+            )
+
+            if dyingSoon then
+                -- Target dying too fast for Rip to get full value - Ferocious Bite instead.
+                -- Per Bite mechanics: cast at low energy (~35), never with Clearcasting active.
+                -- If energy >= 60 or Clearcasting is up, Shred first to burn energy/proc.
+                if not PlayerHasClearcasting() and energy <= 60 and S.FerociousBite:IsReady() then
+                    if Cast(S.FerociousBite) then
+                        return "Ferocious Bite (TTD)"
+                    end
+                end
+            else
+                local ripRemaining = GetDebuffTimeRemaining("target", RIP_NAME)
+
+                -- Apply Rip if not on target OR about to expire.
+                -- Guard against re-casting immediately after application (frame timing).
+                local needsRip = (ripRemaining == 0 or ripRemaining > 13)
+                if ripRefreshEnabled and ripRemaining > 0 and ripRemaining <= ripRefreshTime then
+                    needsRip = true
+                end
+
+                if needsRip and S.Rip:IsReady() then
+                    if Cast(S.Rip) then
+                        return "Rip"
+                    end
                 end
             end
         end
